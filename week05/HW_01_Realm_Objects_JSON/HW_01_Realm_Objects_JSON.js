@@ -126,3 +126,6 @@ while(queue.length){
 
 // Output which can be used in G6 for visualization
 let jsonString= JSON.stringify(resJsonObj);
+
+// Result can be seen thru G6 at 
+// https://7eneb.csb.app/
