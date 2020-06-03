@@ -5,7 +5,7 @@
 
 
 *   simple selector
-    *   *
+    *   \*
     *   div svg|a
     *   .cls
     *   #id
