@@ -1,0 +1,175 @@
+<div id="board"></div>
+
+<script>
+let pattern = [
+	[0, 0, 0],
+	[0, 0, 0],
+	[0, 0, 0]
+]
+
+let color = 1;
+
+function show(){
+	let board = document.getElementById("board");
+	board.innerHTML = "";
+	for(let i=0;i<3;i++){
+		for(let j=0;j<3;j++){
+			let cell = document.createElement("div");
+			cell.classList.add("cell");
+			cell.innerText = 
+				pattern[i][j] == 2?"❌":
+				pattern[i][j] == 1?"🇴":
+				"";
+			cell.addEventListener("click", ()=>userMove(i, j));
+			board.appendChild(cell);
+		}
+		board.appendChild(document.createElement("br"));
+	}
+}
+
+function clone(board){
+	return JSON.parse(JSON.stringify(board));
+}
+
+function userMove(i, j){
+	if(pattern[i][j] !== 0)
+		return;
+	pattern[i][j] = 1;
+	show();
+
+	// if(wins(pattern, i, j, 1)){
+	// 	alert(color + " Wins!");
+	// }
+
+	// color = 3 - 1;
+
+	// let winPoint = willWin(pattern, 1);
+	// if(winPoint){
+	// 	alert(1 + " Will Win at: " + winPoint);
+	// }
+	computerMove();
+}
+
+function computerMove(){
+	let choice = bestChoice(pattern, 2);
+	if(choice.point){
+		pattern[choice.point[0]][choice.point[1]]=2;
+	}
+	show();
+}
+
+function wins(board, x, y, color){
+	{
+		let win=true;
+		for(let i=0; i<3; i++){
+			if(board[x][i]!=color){
+				win=false;
+				break;
+			}
+		}
+		if(win){return true;}
+	}
+	{
+		let win=true;
+		for(let i=0; i<3; i++){
+			if(board[i][y]!=color){
+				win=false;
+				break;
+			}
+		}
+		if(win){return true;}
+	}
+	{
+		let win=true;
+		for(let i=0; i<3; i++){
+			if(board[i][i]!=color){
+				win=false;
+				break;
+			}
+		}
+		if(win){return true;}
+	}
+	{
+		let win=true;
+		for(let i=0; i<3; i++){
+			if(board[i][2-i]!=color){
+				win=false;
+				break;
+			}
+		}
+		if(win){return true;}
+	}
+	return false;
+}
+
+function willWin(board, color){
+	let willWin = false;
+	for(let i=0;i<3;i++){
+		for(let j=0;j<3;j++){
+			if(board[i][j]==0){
+				let tmp = clone(board);
+				tmp[i][j]=color;
+				if(wins(tmp, i, j, color)){
+					willWin = true;
+				}
+				if(willWin){
+					return [i, j];
+				}
+			}
+		}
+	}
+}
+
+function bestChoice(board, color){
+	let point = willWin(board, color);
+	if(point){
+		return {
+			point: point,
+			result: 1
+		};
+	}
+
+	let noEmptyCell = true;
+	let result = -1;
+	outer:for(let i=0;i<3;i++){
+		for(let j=0;j<3;j++){
+			if(board[i][j]==0){
+				noEmptyCell = false;
+				let tmp = clone(board);
+				tmp[i][j]=color;
+
+				let opponentStatus = bestChoice(tmp, 3 - color);
+				if (-opponentStatus.result >= result){
+					point = [i,j];
+					result = -opponentStatus.result;
+				}
+				if(result==1){
+					break outer;
+				}
+			}
+		}
+	}
+			
+	return {
+		point: point,
+		result: noEmptyCell? 0:result
+	};
+}
+
+show();
+</script>
+
+<style type="text/css">
+	.cell{
+		width: 100px;
+		height:100px;
+		background-color: aquamarine;
+		display: inline-block;
+		vertical-align: middle;
+		line-height: 100px;
+		font-size: 50px;
+		text-align: center;
+		border:solid 1px white;
+	}
+
+</style>
