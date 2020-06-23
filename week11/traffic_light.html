@@ -1,0 +1,111 @@
+<style>
+	#light{
+	width:100px;
+	height:100px;
+	border: 1px solid black;
+	border-radius: 50px;
+	background-color: red;
+}
+</style>
+
+
+<div id="light">
+</div>
+
+<button type="button" id="next">Next</button>
+
+<script>
+	function green(){
+		let ele = document.getElementById("light");
+		ele.style.backgroundColor = "green";
+	}
+
+	function yellow(){
+		let ele = document.getElementById("light");
+		ele.style.backgroundColor = "yellow";
+	}
+
+	function red(){
+		let ele = document.getElementById("light");
+		ele.style.backgroundColor = "red";
+	}
+
+	function transitionUsingSetTimeoutDirectly(){
+		let ele = document.getElementById("light");
+			setTimeout(function(){ele.style.backgroundColor = "green"}, 1000);
+			setTimeout(function(){ele.style.backgroundColor = "yellow"}, 2000);
+			setTimeout(function(){ele.style.backgroundColor = "red"}, 3000);
+			setTimeout(transition, 3000);
+	}
+	// transitionUsingSetTimeoutDirectly();
+
+	function sleep(t){
+		return new Promise((resolve, reject)=>{
+			setTimeout(resolve, t);
+		})
+	}
+	function transitionUsingPromise(){
+		sleep(500).then(()=>{
+			green();
+			return sleep(500);
+		}).then(()=>{
+			yellow();
+			return sleep(500);
+		}).then(()=>{
+			red();
+			// return sleep(500);
+		}).then(transitionUsingPromise);
+	}
+	// transitionUsingPromise();
+
+	async function transitionUsingAsync(){
+		while(true){
+			await sleep(500);
+			green();
+			await sleep(500);
+			yellow();
+			await sleep(500);
+			red();
+		}
+	}
+	// transitionUsingAsync();
+
+	function switchLight(element, eventName){
+		return new Promise((resolve, reject)=>{
+			element.addEventListener(eventName, resolve, {once:true})
+		})
+	}
+	async function transitionUsingEventListener(){
+		while(true){
+			await switchLight(document.getElementById("next"), "click");
+			green();
+			await switchLight(document.getElementById("next"), "click");
+			yellow();
+			await switchLight(document.getElementById("next"), "click");
+			red();
+		}
+	}
+	// transitionUsingEventListener();
+
+	function* g(){
+		while(true){
+			green();
+			yield sleep(500);
+			yellow();
+			yield sleep(500);
+			red();
+			yield sleep(500);
+		}
+	}
+
+	function transitionUsingCo(iterator){
+		let {value, done} = iterator.next();
+		if(done){
+			return;
+		}
+		if(value instanceof Promise){
+			value.then(()=>{transitionUsingCo(iterator)})
+		}
+	}
+	// transitionUsingCo(g());
+</script>
